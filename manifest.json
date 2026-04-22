@@ -1,0 +1,10 @@
+{
+  "id": "jupyter-viewer",
+  "name": "Jupyter Notebook Viewer",
+  "version": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "description": "Renders .ipynb files natively inside Obsidian.",
+  "author": "cteplovs",
+  "authorUrl": "",
+  "isDesktopOnly": true
+}
