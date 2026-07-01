@@ -16,18 +16,26 @@ function stripAnsi(str) {
     return str.replace(/\x1b\[[0-9;]*[A-Za-z]/g, '');
 }
 
-// Returns { type: 'html'|'plain', content } or null
+// Returns { type: 'html'|'img'|'plain', content } or null
 function mimeToHtml(data) {
     if (data['text/html']) {
         const raw = data['text/html'];
         return { type: 'html', content: Array.isArray(raw) ? raw.join('') : raw };
     }
+    if (data['image/png']) {
+        const raw = data['image/png'];
+        const b64 = (Array.isArray(raw) ? raw.join('') : raw).replace(/\s+/g, '');
+        return { type: 'img', content: b64 };
+    }
+    if (data['image/jpeg']) {
+        const raw = data['image/jpeg'];
+        const b64 = (Array.isArray(raw) ? raw.join('') : raw).replace(/\s+/g, '');
+        return { type: 'img', content: b64, mime: 'image/jpeg' };
+    }
     if (data['text/plain']) {
         const raw = data['text/plain'];
         return { type: 'plain', content: Array.isArray(raw) ? raw.join('') : raw };
     }
-    // image/png: not present in current corpus; add here if needed:
-    // if (data['image/png']) return { type: 'img', content: data['image/png'] };
     return null;
 }
 
@@ -53,6 +61,11 @@ function renderOutput(output, container) {
             wrap.addClass('jv-rich-output');
             if (result.type === 'html') {
                 wrap.innerHTML = result.content;
+            } else if (result.type === 'img') {
+                wrap.createEl('img', {
+                    cls: 'jv-image-output',
+                    attr: { src: `data:${result.mime || 'image/png'};base64,${result.content}` },
+                });
             } else {
                 wrap.createEl('pre', { cls: 'jv-plain-output', text: result.content });
             }
@@ -164,3 +177,5 @@ class JupyterViewerPlugin extends Plugin {
 }
 
 module.exports = JupyterViewerPlugin;
+
+/* nosourcemap */

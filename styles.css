@@ -112,6 +112,13 @@
     display: none;
 }
 
+/* Rendered image/png, image/jpeg output */
+.jv-image-output {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
 /* Plain-text execute_result */
 .jv-plain-output {
     font-family: var(--font-monospace);
