@@ -83,7 +83,20 @@ async function renderCell(cell, container, plugin, file) {
     if (cell.cell_type === 'markdown') {
         if (!source.trim()) return;
         const mdWrap = container.createDiv({ cls: 'jv-cell jv-markdown-cell' });
-        await MarkdownRenderer.renderMarkdown(source, mdWrap, file.path, plugin);
+        const markdown = source.replace(/attachment:([^\s)"'<>]+)/g, (url, name) => {
+            try {
+                name = decodeURIComponent(name);
+            } catch {
+                return url;
+            }
+            const attachments = cell.attachments || {};
+            if (!Object.prototype.hasOwnProperty.call(attachments, name)) return url;
+            const data = attachments[name];
+            const mime = ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
+                .find(type => data[type]);
+            return mime ? `data:${mime};base64,${normalizeSource(data[mime])}` : url;
+        });
+        await MarkdownRenderer.renderMarkdown(markdown, mdWrap, file.path, plugin);
         return;
     }
 
